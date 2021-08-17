@@ -61,6 +61,12 @@ public class Player extends Rectangle {
 
     }
 
+    public Vector2 getMidpoint(){
+
+        return new Vector2((float) (this.x + 0.5 * width), (float) (this.y + 0.5 * height));
+
+    }
+
     public void draw(float delta){
 
         x = (int) xInternal;

@@ -21,16 +21,12 @@ public class CameraController {
 
     public void update(float delta){
 
-        camera.position.set(player.x, player.y, 0);
-        float diffX = player.x - realCameraX;
-        float diffY = player.y - realCameraY;
+        float diffX = player.getMidpoint().x - realCameraX;
+        float diffY = player.getMidpoint().y - realCameraY;
+
         realCameraX = realCameraX + (diffX * delta * cameraSpeed * (player.speed / 50));
         realCameraY = realCameraY + (diffY * delta * cameraSpeed * (player.speed / 50));
         camera.position.set(MathUtils.floor(realCameraX), MathUtils.floor(realCameraY), 0);
-
-        System.out.println("Speed: " + player.speed + " Camera Speed: " + cameraSpeed);
-        //SPEED 200, CAMERA SPEED 4
-        //SPEED 400, CAMERA SPEED 8
 
     }
 
