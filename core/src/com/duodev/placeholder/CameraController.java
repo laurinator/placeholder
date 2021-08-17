@@ -7,8 +7,8 @@ public class CameraController {
 
     private final OrthographicCamera camera;
     private final Player player;
-    private final float cameraSpeed = 1f;
-    private final float speedAdaptability = 50f;
+    public float cameraSpeed = 2f;
+    public float speedAdaptability = 50f;
 
     public CameraController(OrthographicCamera camera, Player player){
         this.camera = camera;

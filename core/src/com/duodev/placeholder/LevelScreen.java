@@ -26,6 +26,8 @@ public class LevelScreen implements Screen {
 
         cameraController = new CameraController(camera, player);
 
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+
     }
 
     @Override
