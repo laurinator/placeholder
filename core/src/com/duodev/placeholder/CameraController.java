@@ -8,6 +8,7 @@ public class CameraController {
     private final OrthographicCamera camera;
     private final Player player;
     private final float cameraSpeed = 1f;
+    private final float speedAdaptability = 50f;
 
     private float realCameraX;
     private float realCameraY;
@@ -24,8 +25,8 @@ public class CameraController {
         float diffX = player.getMidpoint().x - realCameraX;
         float diffY = player.getMidpoint().y - realCameraY;
 
-        realCameraX = realCameraX + (diffX * delta * cameraSpeed * (player.speed / 50));
-        realCameraY = realCameraY + (diffY * delta * cameraSpeed * (player.speed / 50));
+        realCameraX = realCameraX + (diffX * delta * cameraSpeed * (player.speed / speedAdaptability));
+        realCameraY = realCameraY + (diffY * delta * cameraSpeed * (player.speed / speedAdaptability));
         camera.position.set(MathUtils.floor(realCameraX), MathUtils.floor(realCameraY), 0);
 
     }
