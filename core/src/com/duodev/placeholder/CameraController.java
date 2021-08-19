@@ -10,6 +10,7 @@ public class CameraController {
     public float cameraSpeed = 1f;
     public float speedAdaptability = 50f;
     public float cameraDistance = 100f;
+    public float walkingCameraSpeedMultiplier = 3f;
 
     public CameraController(OrthographicCamera camera, Player player){
         this.camera = camera;
@@ -21,20 +22,26 @@ public class CameraController {
 
         float diffX;
         float diffY;
+        float speedMultiplier = 1f;
 
         if(mode) {
+
             diffX = player.getMidpoint().x - camera.position.x;
             diffY = player.getMidpoint().y - camera.position.y;
 
         } else {
+
+            if(!(player.direction.x == 0 && player.direction.y == 0)){
+                speedMultiplier = walkingCameraSpeedMultiplier;
+            }
 
             diffX = player.getMidpoint().x + player.lookingDirection.x * cameraDistance - camera.position.x;
             diffY = player.getMidpoint().y + player.lookingDirection.y * cameraDistance - camera.position.y;
 
         }
 
-        float newX = camera.position.x + (diffX * delta * cameraSpeed * (player.speed / speedAdaptability));
-        float newY = camera.position.y + (diffY * delta * cameraSpeed * (player.speed / speedAdaptability));
+        float newX = camera.position.x + (diffX * delta * cameraSpeed * (player.speed / speedAdaptability) * speedMultiplier);
+        float newY = camera.position.y + (diffY * delta * cameraSpeed * (player.speed / speedAdaptability) * speedMultiplier);
         camera.position.set(newX, newY, 0);
 
     }
