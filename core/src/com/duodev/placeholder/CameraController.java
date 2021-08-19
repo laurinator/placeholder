@@ -14,7 +14,6 @@ public class CameraController {
         this.camera = camera;
         this.camera.position.set(player.getMidpoint().x, player.getMidpoint().y, 0);
         this.player = player;
-
     }
 
     public void update(float delta){

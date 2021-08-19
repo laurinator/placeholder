@@ -10,8 +10,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class LevelScreen implements Screen {
 
     final Placeholder game;
-    OrthographicCamera camera;
-    CameraController cameraController;
+    final OrthographicCamera camera;
+    final CameraController cameraController;
 
     Player player;
 
@@ -19,10 +19,9 @@ public class LevelScreen implements Screen {
 
         this.game = game;
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480, 270);
+        camera = CameraFactory.createStandardCamera();
 
-        player = new Player(game, new Texture(Gdx.files.internal("vonHinten.png")), new Texture(Gdx.files.internal("vonLinks.png")), new Texture(Gdx.files.internal("vonVorne.png")), new Texture(Gdx.files.internal("vonRechts.png")), 32, 32, 100, 100);
+        player = new Player(this.game, 32, 32, 100, 100);
 
         cameraController = new CameraController(camera, player);
 

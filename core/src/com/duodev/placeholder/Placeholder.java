@@ -13,7 +13,9 @@ public class Placeholder extends Game {
     public void create() {
         batch = new SpriteBatch();
         font = new BitmapFont();
-        this.setScreen(new LevelScreen(this));
+        LevelScreen levelScreen = new LevelScreen(this);
+        MainMenuScreen mainMenuScreen = new MainMenuScreen(this);
+        this.setScreen(levelScreen);
     }
 
     public void render(){

@@ -14,24 +14,28 @@ public class Player extends Rectangle {
     private final Texture[] textures; //UP, RIGHT, DOWN, LEFT
     int currentTextureIndex = 0;
 
+    private final CharacterAnimationRenderer playerRenderer;
+    private PlayerAnimationType currentType = PlayerAnimationType.IDLE_FRONT;
+
     private float xInternal;
     private float yInternal;
     private Vector2 direction;
     public float speed = 100;
     private long lastSpeedTime;
-    int mainDirection = 2;
 
     private long lastHopTime;
 
     private int[] keys;
 
-    public Player(final Placeholder game, Texture texture) {
+    public Player(final Placeholder game) {
 
-        this(game, texture, texture, texture, texture, 16, 16, 270, 420);
+        this(game, 16, 16, 270, 420);
 
     }
 
-    public Player(final Placeholder game, Texture upTexture, Texture rightTexture, Texture downTexture, Texture leftTexture, int width, int height, int x, int y) {
+    public Player(final Placeholder game, int width, int height, int x, int y) {
+
+        this.game = game;
 
         this.width = width;
         this.height = height;
@@ -40,13 +44,18 @@ public class Player extends Rectangle {
         this.xInternal = (float) x;
         this.yInternal = (float) y;
 
-        textures = new Texture[4];
-        textures[0] = upTexture;
-        textures[1] = rightTexture;
-        textures[2] = downTexture;
-        textures[3] = leftTexture;
+        playerRenderer = new CharacterAnimationRenderer(this.game, this.game.batch);
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_FRONT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleFront.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_FRONT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitFront.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_BACK, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleBack.png")), 32, 32, 0.1f));
 
-        this.game = game;
+
+        textures = new Texture[4];
+        textures[0] = new Texture(Gdx.files.internal("vonHinten.png"));
+        textures[1] = new Texture(Gdx.files.internal("vonLinks.png"));
+        textures[2] = new Texture(Gdx.files.internal("vonVorne.png"));
+        textures[3] = new Texture(Gdx.files.internal("vonRechts.png"));
+
         lastSpeedTime = TimeUtils.nanoTime();
         lastHopTime = TimeUtils.nanoTime();
 
@@ -63,7 +72,10 @@ public class Player extends Rectangle {
         x = (int) xInternal;
         y = (int) yInternal;
 
-        game.batch.draw(textures[currentTextureIndex], x, y, width, height);
+        //game.batch.draw(textures[currentTextureIndex], x, y, width, height);
+
+        playerRenderer.render(currentType, xInternal, yInternal);
+
         game.font.draw(game.batch, speed + "", 10, 480);
 
     }
