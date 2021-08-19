@@ -19,7 +19,8 @@ public class Player extends Rectangle {
 
     private float xInternal;
     private float yInternal;
-    private Vector2 direction;
+    public Vector2 direction = new Vector2(0,0);
+    public Vector2 lookingDirection = new Vector2(1,0);
     public float speed = 100;
     private long lastSpeedTime;
 
@@ -74,7 +75,7 @@ public class Player extends Rectangle {
 
         //game.batch.draw(textures[currentTextureIndex], x, y, width, height);
 
-        playerRenderer.render(currentType, xInternal, yInternal);
+        playerRenderer.render(currentType, (int) xInternal, (int) yInternal);
 
         game.font.draw(game.batch, speed + "", 10, 480);
 
@@ -120,6 +121,10 @@ public class Player extends Rectangle {
 
         direction = new Vector2((float) (keys[1] - keys[3]), (float) (keys[0] - keys[2]));
         direction.nor();
+
+        if(!(direction.x == 0 && direction.y == 0)){
+            lookingDirection = direction;
+        }
 
         if (oneDirectionalKeyPressed(keys)) {
             currentTextureIndex = getMainDirection(keys);

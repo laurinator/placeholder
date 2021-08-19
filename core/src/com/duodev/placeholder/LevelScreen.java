@@ -39,7 +39,7 @@ public class LevelScreen implements Screen {
 
         ScreenUtils.clear(0,0,0,1);
 
-        cameraController.update(delta);
+        cameraController.update(delta, false);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
