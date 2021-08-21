@@ -8,7 +8,7 @@ public class AnimationFactory {
 
     public static Animation<TextureRegion> createAnimation(Texture texture, int instanceWidth, int instanceHeight, float frameTime){
 
-        TextureRegion[] frames = TextureRegion.split(texture,  instanceWidth, 32)[0];
+        TextureRegion[] frames = TextureRegion.split(texture,  instanceWidth, instanceHeight)[0];
 
         return new Animation<TextureRegion>(frameTime, frames);
 

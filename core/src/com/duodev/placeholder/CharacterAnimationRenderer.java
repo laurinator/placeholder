@@ -24,8 +24,7 @@ public class CharacterAnimationRenderer {
         stateTime = 0f;
 
         animationMap = new EnumMap<>(PlayerAnimationType.class);
-        Animation<TextureRegion> idleAnimation = AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleFront.png")), 32, 32, 0.1f);
-        animationMap.put(PlayerAnimationType.IDLE_FRONT, idleAnimation);
+
     }
 
     public void addAnimation(PlayerAnimationType type, Animation<TextureRegion> animation){

@@ -1,7 +1,6 @@
 package com.duodev.placeholder;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.MathUtils;
 
 public class CameraController {
 
@@ -28,8 +27,8 @@ public class CameraController {
 
         } else {
 
-            diffX = player.getMidpoint().x + player.lookingDirection.x * cameraDistance - camera.position.x;
-            diffY = player.getMidpoint().y + player.lookingDirection.y * cameraDistance - camera.position.y;
+            diffX = player.getMidpoint().x + player.lookingDirectionVector.x * cameraDistance - camera.position.x;
+            diffY = player.getMidpoint().y + player.lookingDirectionVector.y * cameraDistance - camera.position.y;
 
         }
 

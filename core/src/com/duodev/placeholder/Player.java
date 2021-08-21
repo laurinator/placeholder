@@ -7,20 +7,25 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.EnumMap;
+
 public class Player extends Rectangle {
 
     private final Placeholder game;
 
-    private final Texture[] textures; //UP, RIGHT, DOWN, LEFT
-    int currentTextureIndex = 0;
-
     private final CharacterAnimationRenderer playerRenderer;
-    private PlayerAnimationType currentType = PlayerAnimationType.IDLE_FRONT;
+    private PlayerAnimationType currentAnimationType = PlayerAnimationType.IDLE_DOWN;
+    private MainDirection lookingDirection = MainDirection.DOWN;
+    private final EnumMap<MainDirection, PlayerAnimationType> idleAnimations = new EnumMap<>(MainDirection.class);
+    private final EnumMap<MainDirection, PlayerAnimationType> runningAnimations = new EnumMap<>(MainDirection.class);
+    private final EnumMap<MainDirection, PlayerAnimationType> idleInitAnimations = new EnumMap<>(MainDirection.class);
+    private int lookingDirectionInt = 2;
+
 
     private float xInternal;
     private float yInternal;
     public Vector2 direction = new Vector2(0,0);
-    public Vector2 lookingDirection = new Vector2(1,0);
+    public Vector2 lookingDirectionVector = new Vector2(1,0);
     public float speed = 100;
     private long lastSpeedTime;
 
@@ -46,16 +51,33 @@ public class Player extends Rectangle {
         this.yInternal = (float) y;
 
         playerRenderer = new CharacterAnimationRenderer(this.game, this.game.batch);
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_FRONT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleFront.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_FRONT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitFront.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_BACK, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleBack.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleDown.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitDown.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningDown.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleUp.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitUp.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningUp.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleRight.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitRight.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningRight.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleLeft.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitLeft.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningLeft.png")), 32, 32, 0.1f));
 
+        idleAnimations.put(MainDirection.UP, PlayerAnimationType.IDLE_UP);
+        idleAnimations.put(MainDirection.RIGHT, PlayerAnimationType.IDLE_RIGHT);
+        idleAnimations.put(MainDirection.DOWN, PlayerAnimationType.IDLE_DOWN);
+        idleAnimations.put(MainDirection.LEFT, PlayerAnimationType.IDLE_LEFT);
 
-        textures = new Texture[4];
-        textures[0] = new Texture(Gdx.files.internal("vonHinten.png"));
-        textures[1] = new Texture(Gdx.files.internal("vonLinks.png"));
-        textures[2] = new Texture(Gdx.files.internal("vonVorne.png"));
-        textures[3] = new Texture(Gdx.files.internal("vonRechts.png"));
+        idleInitAnimations.put(MainDirection.UP, PlayerAnimationType.IDLE_STARTUP_UP);
+        idleInitAnimations.put(MainDirection.RIGHT, PlayerAnimationType.IDLE_STARTUP_RIGHT);
+        idleInitAnimations.put(MainDirection.DOWN, PlayerAnimationType.IDLE_STARTUP_DOWN);
+        idleInitAnimations.put(MainDirection.LEFT, PlayerAnimationType.IDLE_STARTUP_LEFT);
+
+        runningAnimations.put(MainDirection.UP, PlayerAnimationType.RUNNING_UP);
+        runningAnimations.put(MainDirection.RIGHT, PlayerAnimationType.RUNNING_RIGHT);
+        runningAnimations.put(MainDirection.DOWN, PlayerAnimationType.RUNNING_DOWN);
+        runningAnimations.put(MainDirection.LEFT, PlayerAnimationType.RUNNING_LEFT);
 
         lastSpeedTime = TimeUtils.nanoTime();
         lastHopTime = TimeUtils.nanoTime();
@@ -73,9 +95,7 @@ public class Player extends Rectangle {
         x = (int) xInternal;
         y = (int) yInternal;
 
-        //game.batch.draw(textures[currentTextureIndex], x, y, width, height);
-
-        playerRenderer.render(currentType, (int) xInternal, (int) yInternal);
+        playerRenderer.render(currentAnimationType, (int) xInternal, (int) yInternal);
 
         game.font.draw(game.batch, speed + "", 10, 480);
 
@@ -98,6 +118,18 @@ public class Player extends Rectangle {
         return -1;
     }
 
+    public boolean isMoving(){
+        return !(this.direction.x == 0 && this.direction.y == 0);
+    }
+
+    public void updateAnimation(int[] keys){
+        if(isMoving()){
+            currentAnimationType = runningAnimations.get(MainDirection.values()[lookingDirectionInt]);
+        }
+    }
+
+
+
     public void updateMovement(float delta) {
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) && TimeUtils.nanoTime() - lastSpeedTime > 1000000000) {
@@ -113,25 +145,30 @@ public class Player extends Rectangle {
             lastHopTime = TimeUtils.nanoTime();
         }
 
-        keys = new int[4]; //UP, RIGHT, DOWN, LEFT
-        keys[0] = (Gdx.input.isKeyPressed(Input.Keys.W)) ? 1 : 0;
-        keys[1] = (Gdx.input.isKeyPressed(Input.Keys.D)) ? 1 : 0;
-        keys[2] = (Gdx.input.isKeyPressed(Input.Keys.S)) ? 1 : 0;
-        keys[3] = (Gdx.input.isKeyPressed(Input.Keys.A)) ? 1 : 0;
+        keys = new int[4];
+        keys[MainDirection.UP.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.W)) ? 1 : 0;
+        keys[MainDirection.RIGHT.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.D)) ? 1 : 0;
+        keys[MainDirection.DOWN.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.S)) ? 1 : 0;
+        keys[MainDirection.LEFT.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.A)) ? 1 : 0;
 
-        direction = new Vector2((float) (keys[1] - keys[3]), (float) (keys[0] - keys[2]));
+        direction = new Vector2((float) (keys[MainDirection.RIGHT.ordinal()] - keys[MainDirection.LEFT.ordinal()]), (float) (keys[MainDirection.UP.ordinal()] - keys[MainDirection.DOWN.ordinal()]));
         direction.nor();
 
-        if(!(direction.x == 0 && direction.y == 0)){
-            lookingDirection = direction;
+
+        //for camera controller, only zoom in one direction if the player is moving
+        if(isMoving()){
+            lookingDirectionVector = direction;
         }
 
+
         if (oneDirectionalKeyPressed(keys)) {
-            currentTextureIndex = getMainDirection(keys);
+            lookingDirectionInt = getMainDirection(keys);
         }
 
         xInternal += direction.x * delta * speed;
         yInternal += direction.y * delta * speed;
+
+        updateAnimation(keys);
 
     }
 }
