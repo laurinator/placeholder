@@ -1,7 +1,6 @@
 package com.duodev.placeholder;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -30,6 +29,12 @@ public class CharacterAnimationRenderer {
     public void addAnimation(PlayerAnimationType type, Animation<TextureRegion> animation){
 
         animationMap.put(type, animation);
+
+    }
+
+    public void resetTimer(){
+
+        stateTime = 0f;
 
     }
 

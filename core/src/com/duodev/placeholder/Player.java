@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.EnumMap;
@@ -19,8 +20,9 @@ public class Player extends Rectangle {
     private final EnumMap<MainDirection, PlayerAnimationType> idleAnimations = new EnumMap<>(MainDirection.class);
     private final EnumMap<MainDirection, PlayerAnimationType> runningAnimations = new EnumMap<>(MainDirection.class);
     private final EnumMap<MainDirection, PlayerAnimationType> idleInitAnimations = new EnumMap<>(MainDirection.class);
-    private int lookingDirectionInt = 2;
 
+    private float timeSinceIdle = 0f;
+    private boolean isIdle = false;
 
     private float xInternal;
     private float yInternal;
@@ -30,8 +32,6 @@ public class Player extends Rectangle {
     private long lastSpeedTime;
 
     private long lastHopTime;
-
-    private int[] keys;
 
     public Player(final Placeholder game) {
 
@@ -51,18 +51,18 @@ public class Player extends Rectangle {
         this.yInternal = (float) y;
 
         playerRenderer = new CharacterAnimationRenderer(this.game, this.game.batch);
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleDown.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitDown.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningDown.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleUp.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitUp.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningUp.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleRight.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitRight.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningRight.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleLeft.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitLeft.png")), 32, 32, 0.1f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningLeft.png")), 32, 32, 0.1f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleDown.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitDown.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningDown.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleUp.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitUp.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningUp.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleRight.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitRight.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningRight.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleLeft.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitLeft.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningLeft.png")), 32, 32, 0.125f));
 
         idleAnimations.put(MainDirection.UP, PlayerAnimationType.IDLE_UP);
         idleAnimations.put(MainDirection.RIGHT, PlayerAnimationType.IDLE_RIGHT);
@@ -92,6 +92,10 @@ public class Player extends Rectangle {
 
     public void draw(float delta) {
 
+        if(isIdle){
+            timeSinceIdle += delta;
+        }
+
         x = (int) xInternal;
         y = (int) yInternal;
 
@@ -109,26 +113,39 @@ public class Player extends Rectangle {
         return sum == 1;
     }
 
-    public int getMainDirection(int[] keys) {
+    public MainDirection getMainDirection(int[] keys) {
         for (int i = 0; i < keys.length; i++) {
             if (keys[i] == 1) {
-                return i;
+                return MainDirection.values()[i];
             }
         }
-        return -1;
+        return null;
     }
 
     public boolean isMoving(){
         return !(this.direction.x == 0 && this.direction.y == 0);
     }
 
-    public void updateAnimation(int[] keys){
+    public void updateAnimation(){
         if(isMoving()){
-            currentAnimationType = runningAnimations.get(MainDirection.values()[lookingDirectionInt]);
+            setAnimation(runningAnimations.get(lookingDirection));
+            timeSinceIdle = 0f;
+        } else if (timeSinceIdle <= 1.5f) { //1.5s per idle startup animation
+            isIdle = true;
+            setAnimation(idleInitAnimations.get(lookingDirection));
+        } else {
+            setAnimation(idleAnimations.get(lookingDirection));
         }
     }
 
+    public void setAnimation(PlayerAnimationType animationType){
 
+        if(!animationType.equals(currentAnimationType)){
+            playerRenderer.resetTimer();
+        }
+        currentAnimationType = animationType;
+
+    }
 
     public void updateMovement(float delta) {
 
@@ -145,7 +162,7 @@ public class Player extends Rectangle {
             lastHopTime = TimeUtils.nanoTime();
         }
 
-        keys = new int[4];
+        int[] keys = new int[4];
         keys[MainDirection.UP.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.W)) ? 1 : 0;
         keys[MainDirection.RIGHT.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.D)) ? 1 : 0;
         keys[MainDirection.DOWN.ordinal()] = (Gdx.input.isKeyPressed(Input.Keys.S)) ? 1 : 0;
@@ -162,13 +179,13 @@ public class Player extends Rectangle {
 
 
         if (oneDirectionalKeyPressed(keys)) {
-            lookingDirectionInt = getMainDirection(keys);
+            lookingDirection = getMainDirection(keys);
         }
 
         xInternal += direction.x * delta * speed;
         yInternal += direction.y * delta * speed;
 
-        updateAnimation(keys);
+        updateAnimation();
 
     }
 }
