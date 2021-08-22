@@ -3,15 +3,19 @@ package com.duodev.placeholder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class LevelScreen implements Screen {
 
     final Placeholder game;
     final OrthographicCamera camera;
     final CameraController cameraController;
+
+    private int fps = 1000;
+    private long timeMillis = TimeUtils.millis();
+
 
     Player player;
 
@@ -37,14 +41,20 @@ public class LevelScreen implements Screen {
     @Override
     public void render(float delta) {
 
+        if(TimeUtils.millis() - timeMillis > 300){
+            timeMillis = TimeUtils.millis();
+            fps = MathUtils.floor(1 / delta);
+        }
+
         ScreenUtils.clear(0,0,0,1);
+
 
         cameraController.update(delta, false);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, MathUtils.floor(1 / delta) + "", 10, 200);
+        game.font.draw(game.batch, fps + "", 10, 200);
         player.draw(delta);
         game.batch.end();
 
