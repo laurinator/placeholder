@@ -51,18 +51,18 @@ public class Player extends Rectangle {
         this.yInternal = (float) y;
 
         playerRenderer = new CharacterAnimationRenderer(this.game, this.game.batch);
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleDown.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitDown.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_DOWN, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningDown.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleUp.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitUp.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_UP, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningUp.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleRight.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitRight.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_RIGHT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningRight.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleLeft.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("idleInitLeft.png")), 32, 32, 0.125f));
-        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_LEFT, AnimationFactory.createAnimation(new Texture(Gdx.files.internal("runningLeft.png")), 32, 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_DOWN, AnimationFactory.createStandardAnimation("idleDown.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_DOWN, AnimationFactory.createStandardAnimation("idleInitDown.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_DOWN, AnimationFactory.createStandardAnimation("runningDown.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_UP, AnimationFactory.createStandardAnimation("idleUp.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_UP, AnimationFactory.createStandardAnimation("idleInitUp.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_UP, AnimationFactory.createStandardAnimation("runningUp.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_RIGHT, AnimationFactory.createStandardAnimation("idleRight.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_RIGHT, AnimationFactory.createStandardAnimation("idleInitRight.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_RIGHT, AnimationFactory.createStandardAnimation("runningRight.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_LEFT, AnimationFactory.createStandardAnimation("idleLeft.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.IDLE_STARTUP_LEFT, AnimationFactory.createStandardAnimation("idleInitLeft.png", 32, 0.125f));
+        playerRenderer.addAnimation(PlayerAnimationType.RUNNING_LEFT, AnimationFactory.createStandardAnimation("runningLeft.png", 32, 0.125f));
 
         idleAnimations.put(MainDirection.UP, PlayerAnimationType.IDLE_UP);
         idleAnimations.put(MainDirection.RIGHT, PlayerAnimationType.IDLE_RIGHT);
