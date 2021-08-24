@@ -12,6 +12,9 @@ public class LevelScreen implements Screen {
     final Placeholder game;
     final OrthographicCamera camera;
     final CameraController cameraController;
+    final InputHandler inputHandler;
+
+    public State state = State.RUNNING;
 
     private int fps = 1000;
     private long timeMillis = TimeUtils.millis();
@@ -23,6 +26,8 @@ public class LevelScreen implements Screen {
 
         this.game = game;
 
+        inputHandler = new InputHandler(this);
+
         camera = CameraFactory.createStandardCamera();
 
         player = new Player(this.game, 32, 32, 100, 100);
@@ -30,6 +35,8 @@ public class LevelScreen implements Screen {
         cameraController = new CameraController(camera, player);
 
         Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+
+        Gdx.graphics.setContinuousRendering(false);
 
     }
 
@@ -40,6 +47,8 @@ public class LevelScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
+        inputHandler.handleInput();
 
         if(TimeUtils.millis() - timeMillis > 300){
             timeMillis = TimeUtils.millis();
@@ -59,6 +68,10 @@ public class LevelScreen implements Screen {
         game.batch.end();
 
         player.updateMovement(delta);
+
+        if(state == State.RUNNING){
+            Gdx.graphics.requestRendering();
+        }
 
     }
 
